@@ -1,15 +1,17 @@
+# rm(list = ls())
 # ==============================================================================
 # Script: 01_spatial_analysis.R
 # ==============================================================================
 # Description: Analysis of spatial overlap between the mesocarnivore mammal
 # community and leporid species in Doñana National Park.
 # This script calculates the spatial overlap (Pianka's index) based on
-# detections across different sites.
+# site level detection rate of each species across different sites.
 # ==============================================================================
 
 # 1. Loading packages ----------------------------------------------------------
 library(dplyr)
 library(tidyr)
+library(camtrapR)
 
 # ==============================================================================
 # 2. Loading and Preparing Data ------------------------------------------------
@@ -18,8 +20,7 @@ library(tidyr)
 # load("RData/01_spatial_analysis.RData")
 
 # Read data
-data <- read.csv("data/dataNicheOverlap.csv", header = TRUE) %>%
-    select(-date_time)
+data <- read.csv("data/dataNicheOverlap.csv", header = TRUE)
 
 # Create frequency table (Site x Species matrix)
 # Rows: Sites, Columns: Species, Values: Number of detections of each species
@@ -40,15 +41,50 @@ species_df <- as.data.frame(detection_matrix)
 rownames(species_df) <- species_df$site
 species_df <- species_df %>% select(-site) # Remove the 'site' column
 
-# Convert counts to proportions by species (column-wise)
+# Calculate site level detection rate
+# Read site operativity data
+operation_tb <- read.csv("data/operation_tb.csv")
+
+# Create matrix of site operativity
+cam_operation <- cameraOperation(
+    CTtable = operation_tb,
+    stationCol = "site",
+    setupCol = "Setup_date",
+    retrievalCol = "Retrieval_date",
+    writecsv = FALSE,
+    hasProblems = TRUE,
+    dateFormat = "%Y-%m-%d %H:%M:%S"
+)
+
+# Count the number of days of operation per site
+operativity_summary <- data.frame(
+    total_ones = rowSums(
+        cam_operation == 1,
+        na.rm = TRUE
+    ) # Count the number of "1" in each row, ignoring NA
+)
+
+head(operativity_summary)
+
+# Calculate site level detection rate. This represents the number of detections
+# of each species at each site per day of operation
+detection_rate_matrix <- species_df / operativity_summary$total_ones[
+    match(rownames(species_df), rownames(operativity_summary))
+]
+
+head(detection_rate_matrix)
+
+# Convert counts detection rates to proportions by species (column-wise)
 # This represents the proportion of a species' total activity that occurs
-# at each site.
-prop_matrix <- apply(species_df, 2, function(x) {
+# at each site normalized by sampling effort (days of operation).
+prop_matrix <- apply(detection_rate_matrix, 2, function(x) {
     if (sum(x) == 0) {
         return(x)
     } # Handle species with 0 detections to avoid division by zero
     return(x / sum(x))
 })
+
+head(prop_matrix)
 
 # ==============================================================================
 # 3. Define Pianka's Index Function --------------------------------------------
@@ -98,6 +134,10 @@ results <- expand.grid(
 print(results)
 
 # Save results to CSV
-write.csv(results, "results/Pianka_index_results.csv", row.names = FALSE)
+write.csv(
+    results,
+    "results/Pianka_index_results.csv",
+    row.names = FALSE
+)
 # save RData
 save.image("RData/01_spatial_analysis.RData")
