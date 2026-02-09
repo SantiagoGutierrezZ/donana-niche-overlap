@@ -1,11 +1,11 @@
 "predator_sp","prey_sp","pianka_index"
-"Vulpes vulpes","Lepus granatensis",0.583
-"Herpestes ichneumon","Lepus granatensis",0.335
-"Genetta genetta","Lepus granatensis",0.371
-"Lynx pardinus","Lepus granatensis",0.003
-"Meles meles","Lepus granatensis",0.413
-"Vulpes vulpes","Oryctolagus cuniculus",0.089
-"Herpestes ichneumon","Oryctolagus cuniculus",0.202
-"Genetta genetta","Oryctolagus cuniculus",0.035
-"Lynx pardinus","Oryctolagus cuniculus",0.585
-"Meles meles","Oryctolagus cuniculus",0.054
+"Vulpes vulpes","Lepus granatensis",0.5
+"Herpestes ichneumon","Lepus granatensis",0.28
+"Genetta genetta","Lepus granatensis",0.1
+"Lynx pardinus","Lepus granatensis",0
+"Meles meles","Lepus granatensis",0.26
+"Vulpes vulpes","Oryctolagus cuniculus",0.1
+"Herpestes ichneumon","Oryctolagus cuniculus",0.2
+"Genetta genetta","Oryctolagus cuniculus",0.01
+"Lynx pardinus","Oryctolagus cuniculus",0.31
+"Meles meles","Oryctolagus cuniculus",0.05

@@ -352,6 +352,8 @@ for (i in seq_along(predator_prey_pamm)) {
 
 results_pred_prey <- bind_rows(results_pred_prey)
 
+print(results_pred_prey)
+
 results_prey_predator <- vector("list", length(prey_predator_pamm))
 names(results_prey_predator) <- names(prey_predator_pamm)
 
@@ -412,6 +414,14 @@ for (carn in car) {
         # Expected names in the lists
         prey_pred <- paste(lep_sp, "-", carn)
         pred_prey <- paste(carn, "-", lep_sp)
+
+        # Determine y-axis limits based on species pair
+        # Lynx pardinus - Oryctolagus cuniculus gets larger range due to high interaction rates
+        y_limits <- if (carn == "Lynx pardinus" && lep_sp == "Oryctolagus cuniculus") {
+            c(0, 10)
+        } else {
+            c(0, 3.1)
+        }
 
         # Check if they exist in the lists
         if (prey_pred %in% names(prey_predator_pamm) && pred_prey %in% names(predator_prey_pamm)) {
@@ -507,7 +517,10 @@ for (carn in car) {
                     labels = c("Predators", "Leporids")
                 ) +
                 scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
-                scale_y_continuous(labels = scales::number_format(accuracy = 0.1)) +
+                scale_y_continuous(
+                    limits = y_limits,
+                    labels = scales::number_format(accuracy = 0.1)
+                ) +
                 labs(
                     x = NULL,
                     y = NULL,
@@ -532,7 +545,7 @@ for (carn in car) {
                     labels = scales::number_format(accuracy = 1)
                 ) +
                 scale_y_continuous(
-                    limits = c(0, 5),
+                    limits = y_limits,
                     labels = scales::number_format(accuracy = 0.1)
                 ) +
                 theme_minimal(base_size = 8) +
