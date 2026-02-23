@@ -238,7 +238,7 @@ habitat_use_proportions <- sweep(
     mutate(
         across(
             everything(),
-            ~ round(.x, 3)
+            ~ round(.x, 2)
         )
     )
 
